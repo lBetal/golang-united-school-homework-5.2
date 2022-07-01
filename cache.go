@@ -18,6 +18,11 @@ func NewCache() *Cache {
 }
 
 func (c *Cache) Get(key string) (string, bool) {
+	for key, val := range c.Map {
+		if time.Now().After(val.Deadline) {
+			delete(c.Map, key)
+		}
+	}
 	if _, ok := c.Map[key]; !ok {
 		return "", false
 	}
