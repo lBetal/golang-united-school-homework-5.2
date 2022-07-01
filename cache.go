@@ -2,22 +2,40 @@ package cache
 
 import "time"
 
+type Data struct {
+	Value    string
+	Deadline time.Time
+}
+
 type Cache struct {
+	Map map[string]Data
 }
 
-func NewCache() Cache {
-	return Cache{}
+func NewCache() *Cache {
+	return &Cache{
+		make(map[string]Data),
+	}
 }
 
-func (receiver) Get(key string) (string, bool) {
-
+func (c *Cache) Get(key string) (string, bool) {
+	if _, ok := c.Map[key]; !ok {
+		return "", false
+	}
+	return c.Map[key].Value, true
 }
 
-func (receiver) Put(key, value string) {
+func (c *Cache) Put(key, value string) {
+	c.Map[key] = Data{Value: value, Deadline: time.Unix(1<<62-1, 0)}
 }
 
-func (receiver) Keys() []string {
+func (c *Cache) Keys() []string {
+	validKeys := []string{}
+	for key := range c.Map {
+		validKeys = append(validKeys, key)
+	}
+	return validKeys
 }
 
-func (receiver) PutTill(key, value string, deadline time.Time) {
+func (c *Cache) PutTill(key, value string, deadline time.Time) {
+	c.Map[key] = Data{Value: value, Deadline: deadline}
 }
